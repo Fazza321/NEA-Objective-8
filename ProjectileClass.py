@@ -40,6 +40,7 @@ class ProjectileSprite(pygame.sprite.Sprite):
         pygame.draw.rect(screen, self.colour, self.rect, 2)
         pygame.draw.circle(screen, self.colour, [self.x, self.y], 5)
 
+    # used to set the attributes of an object
     def setAttributes(self, angle, x, y, col, intersectionLine):
         self.angle = angle
         self.x = x
@@ -47,6 +48,7 @@ class ProjectileSprite(pygame.sprite.Sprite):
         self.colour = col
         self.intersectionLine = intersectionLine
 
+    # sets position off the screen and sets intersection to None
     def reset(self):
         self.x, self.y = -1000, -1000
         self.intersectionLine = None

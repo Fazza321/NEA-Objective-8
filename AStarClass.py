@@ -75,6 +75,9 @@ class Node:
                 self.closestNode = item
         self.addAdj(self.closestNode)
 
+    # this method creates a grid of nodes the size of the screen
+    # it creates a node where there are blank spaces
+    # it adds horizontal and diagonal adjacency's for each node
     @classmethod
     def dynamicNodes(cls):
         gap = (101, 108)
@@ -82,17 +85,20 @@ class Node:
         playerNode = Node(0, 0, "")
         nodesMap.append(playerNode)
 
+        # create a temporary array of nodes where there are blank spaces on the gameMap array
         tempArray = [[Node((j * gap[0]) - 51, (i * gap[1]) - 54) if gameMap.grid[i, j] != 1 else None for j in range(gameMap.width)] for i in
                      range(gameMap.height)]
         for i, row in enumerate(tempArray):
             for j, node in enumerate(row):
                 if not node:
                     continue
+                # make sure not adding adjacency's off the screen
                 if j < gameMap.width - 1:
                     node.addAdj(tempArray[i][j + 1])
                 if i < gameMap.height - 1:
                     node.addAdj(tempArray[i + 1][j])
 
+                # add adjacent nodes in all directions where a node is present
                 if i > 0 and j > 0 and tempArray[i - 1][j - 1]:
                     node.addAdj(tempArray[i - 1][j - 1])
                 if i > 0 and j < gameMap.width - 1 and tempArray[i - 1][j + 1]:
@@ -117,6 +123,7 @@ class AStar:
         self.iteration = 0
         self.nodes = nodes
 
+    # used to find which node has the lowest fCost
     def findClosestNode(self):
         self.shortest = None
         for node in self.graph:
@@ -133,30 +140,46 @@ class AStar:
         self.finalNode = self.graph[-1]
         self.firstNode.x = player.x
         self.firstNode.y = player.y
+        # when finding the path reset nodes and set hCosts
         for node in self.graph:
             node.reset()
             node.setHCost(self.finalNode)
             node.setFCost()
+        # find distance to start of first node (player)
         self.firstNode.setGCost()
+        # use the findAdj method to find the closest node to player
         self.firstNode.findAdj(self.graph)
 
+        # run until shortest path is found
         while self.finalNode in self.graph:
             self.iteration += 1
+            # find the closest neighbour
             self.findClosestNode()
+            # loop through this node's neighbours
             for adjNode in self.shortest.adjNodes:
+                # if a node isn't in the graph or if the path it creates is longer than the current path then go to next node
                 if adjNode not in self.graph or self.shortest.adjNodes[adjNode] + self.shortest.gCost + adjNode.hCost > adjNode.fCost:
                     continue
+                # set the gCost of the node to its current distance plus the previous node's gCost
                 adjNode.gCost = self.shortest.adjNodes[adjNode] + self.shortest.gCost
                 adjNode.setFCost()
+                # update the path to contain this node
                 self.previousNode.update({adjNode: self.shortest})
-
+            # remove this node and go onto the next
             self.graph.remove(self.shortest)
+        # start from the last node
         node = self.finalNode
+        # set the first node to red
         self.firstNode.colour = Colours.red
+        # loop through all nodes in the previousNode dictionary
         while node != self.firstNode:
+            # set all the nodes to red
             node.colour = Colours.red
+            # insert the current node to the path
             self.shortestPath.insert(0, node)
+            # go onto the next node
             node = self.previousNode[node]
+        # add the first node into the shortest path
         self.shortestPath.insert(0, self.firstNode)
 
 

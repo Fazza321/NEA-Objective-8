@@ -35,12 +35,15 @@ class PlayerSprite(pygame.sprite.Sprite):
         self.name = ""
         self.col = Colours.black
 
+    # finds the position along the surface using the index
+    # blits the surface to the screen
     def getImage(self):
         surface = pygame.Surface((self.width, self.height))
         self.image = surface
         self.image.set_colorkey(Colours.black)
         surface.blit(self.images, (0, 0), ((self.index * self.width), 0, self.width, self.height))
 
+    # animation
     def update(self, screen):
         if not self.x and not self.y:
             return
@@ -95,10 +98,13 @@ class PlayerSprite(pygame.sprite.Sprite):
         if finalSprite.rect.colliderect(self.rect):
             return True
 
+    # loops through obstacles and checks for collisions
+    # if there is a collision then the player's velocity is scaled, so they won't move through it
     def objectCollide(self, sprites):
         if not self.canTeleport:
             return
         for sprite in sprites:
+            # horizontal collisions
             if vel.i > 0 and sprite.rect.colliderect(self.rect.x + ceil(vel.i), self.rect.y, self.width, self.height):
                 vel.i = 0
             elif vel.i <= 0 and sprite.rect.colliderect(self.rect.x + floor(vel.i), self.rect.y, self.width, self.height):
@@ -107,12 +113,14 @@ class PlayerSprite(pygame.sprite.Sprite):
             if not sprite.rect.colliderect(self.rect.x, self.rect.y + vel.j, self.width, self.height):
                 continue
 
+            # vertical collisions
             if vel.j < 0:
                 vel.j = sprite.rect.bottom - self.rect.top
             else:
                 vel.j = sprite.rect.top - self.rect.bottom
                 self.canJump = True
 
+    # checks if the player collides with a portal and runs the teleport method if so
     def portalCollide(self):
         collision = None
         for sprite in portalSprites:
@@ -126,6 +134,8 @@ class PlayerSprite(pygame.sprite.Sprite):
             self.teleport(collision)
             self.setCanTeleport(False)
 
+    # changes the players position vector to the opposite portal that they collided with
+    # calls the vecAngleChange method which rotates the velocity so the player moves smoothly through the portal
     def teleport(self, portalType):
         if portalType.name == 1:
             posVec.setVec(portal2.x, portal2.y)
