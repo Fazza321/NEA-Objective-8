@@ -217,7 +217,8 @@ def Choices():
 
 
 def Scores():
-    pass
+    db.sortScores()
+    db.allScores()
 
 
 def SignUp():
