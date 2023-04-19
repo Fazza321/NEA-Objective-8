@@ -131,12 +131,13 @@ class PlayerSprite(pygame.sprite.Sprite):
         if not self.canTeleport:
             return
         if collision and portal.x and portal2.x:
-            self.teleport(collision)
+            PlayerSprite.teleport(collision)
             self.setCanTeleport(False)
 
     # changes the players position vector to the opposite portal that they collided with
     # calls the vecAngleChange method which rotates the velocity so the player moves smoothly through the portal
-    def teleport(self, portalType):
+    @classmethod
+    def teleport(cls, portalType):
         if portalType.name == 1:
             posVec.setVec(portal2.x, portal2.y)
             vel.vecAngleChange(portal, portal2)
